@@ -1,0 +1,40 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+def movie_ratings_analysis(min_votes):
+    # Load movie ratings data from IMDb
+    movie_ratings = pd.read_csv("https://datasets.imdbws.com/title.ratings.tsv.gz", sep="\t")
+    
+    # Filter movies with less than min_votes votes
+    movie_ratings = movie_ratings[movie_ratings["numVotes"] >= min_votes]
+    
+    # Group movies by average rating and count the number of movies in each group
+    movie_ratings_grouped = movie_ratings.groupby("averageRating").count()
+    
+    # Plot a bar chart of the top 10 rated movies
+    movie_ratings_grouped.sort_values(by="tconst", ascending=False, inplace=True)
+    top_10 = movie_ratings_grouped.head(10)
+    x = top_10.index
+    y = top_10["tconst"]
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.bar(x, y, color="#4287f5")
+    ax.set_xlabel("Average Rating")
+    ax.set_ylabel("Number of Movies")
+    ax.set_title("Top 10 Rated Movies on IMDb (with at least {} votes)".format(min_votes))
+    ax.set_xticks(np.arange(0, 10.1, 0.5))
+    ax.set_xticklabels(np.arange(0, 10.1, 0.5))
+    plt.tight_layout()
+    plt.show()
+    
+    # Calculate summary statistics for average ratings
+    mean = movie_ratings["averageRating"].mean()
+    median = movie_ratings["averageRating"].median()
+    std = movie_ratings["averageRating"].std()
+    print("\nSummary Statistics for Average Ratings:")
+    print("Mean: {:.2f}".format(mean))
+    print("Median: {:.2f}".format(median))
+    print("Standard Deviation: {:.2f}".format(std))
+
+# Call the function with a minimum of 25,000 votes
+movie_ratings_analysis(25000)
